@@ -44,3 +44,21 @@ export const deleteDataset = async (id) => {
     throw error;
   }
 };
+
+export const runValidation = async (id) => {
+  try {
+    const response = await apiClient.post(`/datasets/${id}/validate`);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getValidationResults = async (id) => {
+  try {
+    const response = await apiClient.get(`/datasets/${id}/validation-results`);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};

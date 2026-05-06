@@ -1,9 +1,14 @@
 import { Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
+import Datasets from './pages/Datasets';
+import Validation from './pages/Validation';
 
 export default function AppRoutes() {
   return (
     <Routes>
-      {/* Routes will be configured here */}
+      <Route path="/" element={<Home />} />
+      <Route path="/datasets" element={<Datasets />} />
+      <Route path="/validation/:datasetId" element={<Validation />} />
     </Routes>
   );
 }
