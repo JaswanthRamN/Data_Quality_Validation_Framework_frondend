@@ -10,6 +10,7 @@ export default function Validation() {
   const [error, setError] = useState(null);
   const [expandedRules, setExpandedRules] = useState({});
   const [filterType, setFilterType] = useState('all'); // all, errors, warnings, passed
+  const [viewMode, setViewMode] = useState('list'); // list or table
 
   useEffect(() => {
     if (datasetId) {
@@ -222,24 +223,111 @@ export default function Validation() {
 
       {/* Filter Section */}
       <div className="validation-filters">
-        <label htmlFor="filter-select">Filter Results:</label>
-        <select
-          id="filter-select"
-          value={filterType}
-          onChange={(e) => setFilterType(e.target.value)}
-          className="filter-select"
-        >
-          <option value="all">All ({summaryStats.total})</option>
-          <option value="passed">Passed ({summaryStats.passed})</option>
-          <option value="failed">Failed ({summaryStats.failed})</option>
-          <option value="warnings">Warnings ({summaryStats.warning})</option>
-        </select>
+        <div className="filter-controls">
+          <label htmlFor="filter-select">Filter Results:</label>
+          <select
+            id="filter-select"
+            value={filterType}
+            onChange={(e) => setFilterType(e.target.value)}
+            className="filter-select"
+          >
+            <option value="all">All ({summaryStats.total})</option>
+            <option value="passed">Passed ({summaryStats.passed})</option>
+            <option value="failed">Failed ({summaryStats.failed})</option>
+            <option value="warnings">Warnings ({summaryStats.warning})</option>
+          </select>
+        </div>
+        <div className="view-mode-toggle">
+          <button
+            className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
+            onClick={() => setViewMode('list')}
+            title="List View"
+          >
+            ≡ List
+          </button>
+          <button
+            className={`view-toggle-btn ${viewMode === 'table' ? 'active' : ''}`}
+            onClick={() => setViewMode('table')}
+            title="Table View"
+          >
+            ⊞ Table
+          </button>
+        </div>
       </div>
 
       {/* Results Section */}
       <div className="validation-results">
         {filteredResults.length === 0 ? (
           <p className="empty-state">No results match the selected filter</p>
+        ) : viewMode === 'table' ? (
+          <div className="results-table-wrapper">
+            <table className="results-table">
+              <thead>
+                <tr>
+                  <th>Status</th>
+                  <th>Rule Name</th>
+                  <th>Description</th>
+                  <th>Severity</th>
+                  <th>Affected Records</th>
+                  <th>Affected Columns</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredResults.map((result, index) => (
+                  <tr
+                    key={result.ruleId || index}
+                    className={`table-row-${result.status}`}
+                    onClick={() => toggleRuleExpanded(result.ruleId || index)}
+                  >
+                    <td>
+                      <span
+                        className="status-badge"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          padding: '4px 8px',
+                          borderRadius: '4px',
+                          backgroundColor:
+                            result.status === 'passed'
+                              ? '#d4edda'
+                              : result.status === 'failed'
+                              ? '#f8d7da'
+                              : '#fff3cd',
+                          color:
+                            result.status === 'passed'
+                              ? '#155724'
+                              : result.status === 'failed'
+                              ? '#721c24'
+                              : '#856404',
+                          fontSize: '11px',
+                          fontWeight: '600',
+                        }}
+                      >
+                        <span
+                          style={{
+                            display: 'inline-block',
+                            width: '8px',
+                            height: '8px',
+                            borderRadius: '50%',
+                            backgroundColor: getStatusColor(result.status),
+                          }}
+                        ></span>
+                        {getStatusLabel(result.status)}
+                      </span>
+                    </td>
+                    <td className="font-weight-600">{result.ruleName}</td>
+                    <td>{result.description}</td>
+                    <td>{result.severity || '-'}</td>
+                    <td className="text-right">
+                      {result.affectedRecords ? result.affectedRecords.toLocaleString() : '-'}
+                    </td>
+                    <td>{result.affectedColumns?.join(', ') || '-'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : (
           <div className="results-list">
             {filteredResults.map((result, index) => (
