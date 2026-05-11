@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Datasets from './pages/Datasets';
 import Validation from './pages/Validation';
+import Reconciliation from './pages/Reconciliation';
 
 export default function AppRoutes() {
   return (
@@ -9,6 +10,7 @@ export default function AppRoutes() {
       <Route path="/" element={<Home />} />
       <Route path="/datasets" element={<Datasets />} />
       <Route path="/validation/:datasetId" element={<Validation />} />
+      <Route path="/reconciliation/:datasetId" element={<Reconciliation />} />
     </Routes>
   );
 }

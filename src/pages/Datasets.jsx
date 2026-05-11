@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getDatasets, createDataset, runValidation } from '../services/datasetService';
+import { getDatasets, createDataset, runValidation, runReconciliation } from '../services/datasetService';
 import FileUpload from '../components/FileUpload';
 
 export default function Datasets() {
@@ -15,6 +15,7 @@ export default function Datasets() {
   const [selectedDataset, setSelectedDataset] = useState(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [validatingDatasetId, setValidatingDatasetId] = useState(null);
+  const [reconcilingDatasetId, setReconcilingDatasetId] = useState(null);
 
   useEffect(() => {
     fetchDatasets();
@@ -114,6 +115,26 @@ export default function Datasets() {
       setError(errorMessage);
     } finally {
       setValidatingDatasetId(null);
+    }
+  };
+
+  const handleRunReconciliation = async (dataset) => {
+    try {
+      setReconcilingDatasetId(dataset.id);
+      setError(null);
+      const result = await runReconciliation(dataset.id, dataset.id);
+      setSuccessMessage(`Reconciliation completed for "${dataset.name}"`);
+      
+      // Refresh the datasets list
+      await fetchDatasets();
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (err) {
+      const errorMessage = err.response?.data?.message || err.message || 'Reconciliation failed';
+      setError(errorMessage);
+    } finally {
+      setReconcilingDatasetId(null);
     }
   };
 
@@ -236,12 +257,27 @@ export default function Datasets() {
                 >
                   {validatingDatasetId === dataset.id ? 'Validating...' : 'Run Validation'}
                 </button>
+                <button 
+                  className="btn-secondary"
+                  onClick={() => handleRunReconciliation(dataset)}
+                  disabled={reconcilingDatasetId === dataset.id}
+                >
+                  {reconcilingDatasetId === dataset.id ? 'Reconciling...' : 'Run Reconciliation'}
+                </button>
                 {dataset.validationStatus && (
                   <button 
                     className="btn-secondary"
                     onClick={() => navigate(`/validation/${dataset.id}`)}
                   >
-                    View Results
+                    View Validation
+                  </button>
+                )}
+                {dataset.reconciliationStatus && (
+                  <button 
+                    className="btn-secondary"
+                    onClick={() => navigate(`/reconciliation/${dataset.id}`)}
+                  >
+                    View Reconciliation
                   </button>
                 )}
               </div>

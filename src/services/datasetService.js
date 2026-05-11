@@ -62,3 +62,23 @@ export const getValidationResults = async (id) => {
     throw error;
   }
 };
+
+export const runReconciliation = async (id, targetDatasetId) => {
+  try {
+    const response = await apiClient.post(`/datasets/${id}/reconcile`, {
+      targetDatasetId,
+    });
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getReconciliationResults = async (id) => {
+  try {
+    const response = await apiClient.get(`/datasets/${id}/reconciliation`);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
