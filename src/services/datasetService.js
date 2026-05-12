@@ -82,3 +82,21 @@ export const getReconciliationResults = async (id) => {
     throw error;
   }
 };
+
+export const runAnomalyDetection = async (id) => {
+  try {
+    const response = await apiClient.post(`/datasets/${id}/detect-anomalies`);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getAnomaliesResults = async (id) => {
+  try {
+    const response = await apiClient.get(`/datasets/${id}/anomalies`);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};

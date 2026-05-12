@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getDatasets, createDataset, runValidation, runReconciliation } from '../services/datasetService';
+import { getDatasets, createDataset, runValidation, runReconciliation, runAnomalyDetection } from '../services/datasetService';
 import FileUpload from '../components/FileUpload';
 
 export default function Datasets() {
@@ -16,6 +16,7 @@ export default function Datasets() {
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [validatingDatasetId, setValidatingDatasetId] = useState(null);
   const [reconcilingDatasetId, setReconcilingDatasetId] = useState(null);
+  const [detectingAnomaliesDatasetId, setDetectingAnomaliesDatasetId] = useState(null);
 
   useEffect(() => {
     fetchDatasets();
@@ -135,6 +136,26 @@ export default function Datasets() {
       setError(errorMessage);
     } finally {
       setReconcilingDatasetId(null);
+    }
+  };
+
+  const handleDetectAnomalies = async (dataset) => {
+    try {
+      setDetectingAnomaliesDatasetId(dataset.id);
+      setError(null);
+      const result = await runAnomalyDetection(dataset.id);
+      setSuccessMessage(`Anomaly detection completed for "${dataset.name}"`);
+      
+      // Refresh the datasets list
+      await fetchDatasets();
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (err) {
+      const errorMessage = err.response?.data?.message || err.message || 'Anomaly detection failed';
+      setError(errorMessage);
+    } finally {
+      setDetectingAnomaliesDatasetId(null);
     }
   };
 
@@ -264,6 +285,13 @@ export default function Datasets() {
                 >
                   {reconcilingDatasetId === dataset.id ? 'Reconciling...' : 'Run Reconciliation'}
                 </button>
+                <button 
+                  className="btn-secondary"
+                  onClick={() => handleDetectAnomalies(dataset)}
+                  disabled={detectingAnomaliesDatasetId === dataset.id}
+                >
+                  {detectingAnomaliesDatasetId === dataset.id ? 'Detecting...' : 'Detect Anomalies'}
+                </button>
                 {dataset.validationStatus && (
                   <button 
                     className="btn-secondary"
@@ -278,6 +306,14 @@ export default function Datasets() {
                     onClick={() => navigate(`/reconciliation/${dataset.id}`)}
                   >
                     View Reconciliation
+                  </button>
+                )}
+                {dataset.anomaliesStatus && (
+                  <button 
+                    className="btn-secondary"
+                    onClick={() => navigate(`/anomalies/${dataset.id}`)}
+                  >
+                    View Anomalies
                   </button>
                 )}
               </div>
