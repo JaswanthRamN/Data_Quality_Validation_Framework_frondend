@@ -1538,6 +1538,39 @@ body {
   cursor: pointer;
 }
 
+.anomalies-filters .filter-input {
+  padding: 6px 10px;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  font-size: 13px;
+  background-color: white;
+  min-width: 150px;
+}
+
+.anomalies-filters .filter-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+}
+
+.anomalies-filters .btn-reset-filters {
+  padding: 6px 14px;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  white-space: nowrap;
+}
+
+.anomalies-filters .btn-reset-filters:hover {
+  background-color: #545b62;
+  box-shadow: 0 2px 4px rgba(84, 91, 98, 0.2);
+}
+
 /* Anomalies Results */
 .anomalies-results {
   background: white;
@@ -1717,7 +1750,12 @@ body {
     align-items: flex-start;
   }
 
-  .anomalies-filters .filter-select {
+  .anomalies-filters .filter-select,
+  .anomalies-filters .filter-input {
+    width: 100%;
+  }
+
+  .anomalies-filters .btn-reset-filters {
     width: 100%;
   }
 

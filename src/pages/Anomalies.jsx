@@ -11,6 +11,11 @@ export default function Anomalies() {
   const [expandedRows, setExpandedRows] = useState({});
   const [filterType, setFilterType] = useState('all'); // all, critical, major, minor
   const [filterAnomalyType, setFilterAnomalyType] = useState('all'); // all, outlier, duplicate, missing, statistical, pattern
+  const [filterConfidence, setFilterConfidence] = useState('all'); // all, high, medium, low
+  const [searchColumn, setSearchColumn] = useState('');
+  const [searchRecordId, setSearchRecordId] = useState('');
+  const [sortBy, setSortBy] = useState('severity'); // severity, confidence, column, recordId
+  const [sortOrder, setSortOrder] = useState('desc'); // asc, desc
 
   useEffect(() => {
     if (datasetId) {
@@ -52,7 +57,59 @@ export default function Anomalies() {
       filtered = filtered.filter((a) => a.type === filterAnomalyType);
     }
 
+    if (filterConfidence !== 'all') {
+      filtered = filtered.filter((a) => {
+        const confidence = a.confidence || 0;
+        if (filterConfidence === 'high') return confidence >= 80;
+        if (filterConfidence === 'medium') return confidence >= 50 && confidence < 80;
+        if (filterConfidence === 'low') return confidence < 50;
+        return true;
+      });
+    }
+
+    if (searchColumn.trim()) {
+      const searchTerm = searchColumn.toLowerCase();
+      filtered = filtered.filter((a) => 
+        a.column?.toLowerCase().includes(searchTerm)
+      );
+    }
+
+    if (searchRecordId.trim()) {
+      const searchTerm = searchRecordId.toLowerCase();
+      filtered = filtered.filter((a) => 
+        a.recordId?.toString().toLowerCase().includes(searchTerm)
+      );
+    }
+
+    // Sorting
+    filtered = filtered.sort((a, b) => {
+      let compareValue = 0;
+      
+      if (sortBy === 'severity') {
+        const severityOrder = { critical: 0, major: 1, minor: 2 };
+        compareValue = (severityOrder[a.severity] || 3) - (severityOrder[b.severity] || 3);
+      } else if (sortBy === 'confidence') {
+        compareValue = (a.confidence || 0) - (b.confidence || 0);
+      } else if (sortBy === 'column') {
+        compareValue = (a.column || '').localeCompare(b.column || '');
+      } else if (sortBy === 'recordId') {
+        compareValue = (a.recordId || '').toString().localeCompare((b.recordId || '').toString());
+      }
+
+      return sortOrder === 'desc' ? -compareValue : compareValue;
+    });
+
     return filtered;
+  };
+
+  const resetFilters = () => {
+    setFilterType('all');
+    setFilterAnomalyType('all');
+    setFilterConfidence('all');
+    setSearchColumn('');
+    setSearchRecordId('');
+    setSortBy('severity');
+    setSortOrder('desc');
   };
 
   const getSeverityColor = (severity) => {
@@ -286,6 +343,7 @@ export default function Anomalies() {
               <option value="minor">Minor ({severityBreakdown.minor})</option>
             </select>
           </div>
+
           <div className="filter-group">
             <label htmlFor="type-filter">By Type:</label>
             <select
@@ -302,6 +360,83 @@ export default function Anomalies() {
               <option value="pattern">Pattern ({anomalyTypeBreakdown.pattern})</option>
             </select>
           </div>
+
+          <div className="filter-group">
+            <label htmlFor="confidence-filter">By Confidence:</label>
+            <select
+              id="confidence-filter"
+              value={filterConfidence}
+              onChange={(e) => setFilterConfidence(e.target.value)}
+              className="filter-select"
+            >
+              <option value="all">All Confidence Levels</option>
+              <option value="high">High (≥80%)</option>
+              <option value="medium">Medium (50-79%)</option>
+              <option value="low">Low (&lt;50%)</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="filter-controls">
+          <div className="filter-group">
+            <label htmlFor="column-search">Search Column:</label>
+            <input
+              id="column-search"
+              type="text"
+              placeholder="Enter column name..."
+              value={searchColumn}
+              onChange={(e) => setSearchColumn(e.target.value)}
+              className="filter-input"
+            />
+          </div>
+
+          <div className="filter-group">
+            <label htmlFor="recordid-search">Search Record ID:</label>
+            <input
+              id="recordid-search"
+              type="text"
+              placeholder="Enter record ID..."
+              value={searchRecordId}
+              onChange={(e) => setSearchRecordId(e.target.value)}
+              className="filter-input"
+            />
+          </div>
+
+          <div className="filter-group">
+            <label htmlFor="sort-by">Sort By:</label>
+            <select
+              id="sort-by"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="filter-select"
+            >
+              <option value="severity">Severity</option>
+              <option value="confidence">Confidence</option>
+              <option value="column">Column</option>
+              <option value="recordId">Record ID</option>
+            </select>
+          </div>
+
+          <div className="filter-group">
+            <label htmlFor="sort-order">Order:</label>
+            <select
+              id="sort-order"
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+              className="filter-select"
+            >
+              <option value="desc">Descending</option>
+              <option value="asc">Ascending</option>
+            </select>
+          </div>
+
+          <button 
+            className="btn-reset-filters" 
+            onClick={resetFilters}
+            title="Reset all filters to default"
+          >
+            Reset Filters
+          </button>
         </div>
       </div>
 
