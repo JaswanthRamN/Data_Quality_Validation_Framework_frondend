@@ -440,101 +440,116 @@ export default function Anomalies() {
         </div>
       </div>
 
-      {/* Anomalies List */}
+      {/* Anomalies Results Table */}
       <div className="anomalies-results">
-        <h2>Detected Anomalies</h2>
+        <div className="results-header">
+          <h2>Detected Anomalies ({filteredAnomalies.length})</h2>
+        </div>
         {filteredAnomalies.length === 0 ? (
           <p className="empty-state">No anomalies match the selected filters</p>
         ) : (
-          <div className="anomalies-list">
-            {filteredAnomalies.map((anomaly, index) => (
-              <div key={anomaly.id || index} className="anomaly-item">
-                <div
-                  className="anomaly-header"
-                  onClick={() => toggleRowExpanded(anomaly.id || index)}
-                >
-                  <div className="anomaly-status">
-                    <span
-                      className="status-dot"
-                      style={{ backgroundColor: getSeverityColor(anomaly.severity) }}
-                    ></span>
-                    <span className="status-text">{getSeverityLabel(anomaly.severity)}</span>
-                  </div>
-                  <div className="anomaly-title">
-                    <h4>{getAnomalyTypeLabel(anomaly.type)}</h4>
-                    <p className="anomaly-description">{anomaly.description}</p>
-                  </div>
-                  <button className="expand-btn">
-                    {expandedRows[anomaly.id || index] ? '▼' : '▶'}
-                  </button>
-                </div>
+          <div className="table-wrapper">
+            <table className="anomalies-table">
+              <thead>
+                <tr>
+                  <th className="col-severity">Severity</th>
+                  <th className="col-type">Type</th>
+                  <th className="col-record">Record ID</th>
+                  <th className="col-column">Column</th>
+                  <th className="col-value">Value</th>
+                  <th className="col-confidence">Confidence</th>
+                  <th className="col-description">Description</th>
+                  <th className="col-actions">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredAnomalies.map((anomaly, index) => (
+                  <tr key={anomaly.id || index} className={`row-${anomaly.severity}`}>
+                    <td className="col-severity">
+                      <div className="severity-badge" style={{ borderLeftColor: getSeverityColor(anomaly.severity) }}>
+                        <span className="severity-dot" style={{ backgroundColor: getSeverityColor(anomaly.severity) }}></span>
+                        <span className="severity-text">{anomaly.severity?.toUpperCase()}</span>
+                      </div>
+                    </td>
+                    <td className="col-type">{getAnomalyTypeLabel(anomaly.type)}</td>
+                    <td className="col-record">{anomaly.recordId || '-'}</td>
+                    <td className="col-column">{anomaly.column || '-'}</td>
+                    <td className="col-value">
+                      <span className="value-text" title={String(anomaly.value)}>
+                        {anomaly.value !== undefined ? String(anomaly.value).substring(0, 30) : '-'}
+                        {anomaly.value !== undefined && String(anomaly.value).length > 30 ? '...' : ''}
+                      </span>
+                    </td>
+                    <td className="col-confidence">
+                      <div className="confidence-badge">
+                        <span className="confidence-value">{anomaly.confidence || 0}%</span>
+                      </div>
+                    </td>
+                    <td className="col-description">
+                      <span className="description-text" title={anomaly.description}>
+                        {anomaly.description?.substring(0, 50) || '-'}
+                        {anomaly.description && anomaly.description.length > 50 ? '...' : ''}
+                      </span>
+                    </td>
+                    <td className="col-actions">
+                      <button 
+                        className="btn-expand-details"
+                        onClick={() => toggleRowExpanded(anomaly.id || index)}
+                        title={expandedRows[anomaly.id || index] ? 'Hide details' : 'Show details'}
+                      >
+                        {expandedRows[anomaly.id || index] ? '▼ Hide' : '▶ View'}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
-                {expandedRows[anomaly.id || index] && (
-                  <div className="anomaly-details">
-                    {anomaly.recordId && (
-                      <div className="detail-row">
-                        <span className="detail-label">Record ID:</span>
-                        <span className="detail-value">{anomaly.recordId}</span>
+        {/* Expandable Details Row */}
+        {filteredAnomalies.map((anomaly, index) => (
+          expandedRows[anomaly.id || index] && (
+            <div key={`details-${anomaly.id || index}`} className="table-row-details">
+              <div className="details-content">
+                <div className="details-grid">
+                  {anomaly.expectedRange && (
+                    <div className="detail-group">
+                      <label>Expected Range:</label>
+                      <p>{anomaly.expectedRange}</p>
+                    </div>
+                  )}
+                  {anomaly.metrics && Object.keys(anomaly.metrics).length > 0 && (
+                    <div className="detail-group">
+                      <label>Metrics:</label>
+                      <div className="metrics-list">
+                        {Object.entries(anomaly.metrics).map(([key, value]) => (
+                          <span key={key} className="metric-badge">
+                            {key}: {value}
+                          </span>
+                        ))}
                       </div>
-                    )}
-                    {anomaly.column && (
-                      <div className="detail-row">
-                        <span className="detail-label">Column:</span>
-                        <span className="detail-value">{anomaly.column}</span>
-                      </div>
-                    )}
-                    {anomaly.value !== undefined && (
-                      <div className="detail-row">
-                        <span className="detail-label">Value:</span>
-                        <span className="detail-value">{String(anomaly.value)}</span>
-                      </div>
-                    )}
-                    {anomaly.expectedRange && (
-                      <div className="detail-row">
-                        <span className="detail-label">Expected Range:</span>
-                        <span className="detail-value">{anomaly.expectedRange}</span>
-                      </div>
-                    )}
-                    {anomaly.confidence && (
-                      <div className="detail-row">
-                        <span className="detail-label">Confidence:</span>
-                        <span className="detail-value">{anomaly.confidence}%</span>
-                      </div>
-                    )}
-                    {anomaly.metrics && (
-                      <div className="detail-row">
-                        <span className="detail-label">Metrics:</span>
-                        <div className="detail-value metrics-list">
-                          {Object.entries(anomaly.metrics).map(([key, value]) => (
-                            <span key={key} className="metric-badge">
-                              {key}: {value}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    {anomaly.recommendation && (
-                      <div className="detail-row suggestion-row">
-                        <span className="detail-label">Recommendation:</span>
-                        <span className="detail-value suggestion-text">
-                          {anomaly.recommendation}
-                        </span>
-                      </div>
-                    )}
-                    {anomaly.relatedRecords && anomaly.relatedRecords.length > 0 && (
-                      <div className="detail-row">
-                        <span className="detail-label">Related Records:</span>
-                        <span className="detail-value">
-                          {anomaly.relatedRecords.join(', ')}
-                        </span>
-                      </div>
-                    )}
+                    </div>
+                  )}
+                  {anomaly.relatedRecords && anomaly.relatedRecords.length > 0 && (
+                    <div className="detail-group">
+                      <label>Related Records:</label>
+                      <p>{anomaly.relatedRecords.join(', ')}</p>
+                    </div>
+                  )}
+                </div>
+                {anomaly.recommendation && (
+                  <div className="detail-group full-width">
+                    <label>Recommendation:</label>
+                    <div className="recommendation-box">
+                      <p>{anomaly.recommendation}</p>
+                    </div>
                   </div>
                 )}
               </div>
-            ))}
-          </div>
-        )}
+            </div>
+          )
+        ))}
       </div>
 
       {/* Action Buttons */}

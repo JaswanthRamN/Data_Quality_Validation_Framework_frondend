@@ -1717,6 +1717,243 @@ body {
   color: #856404;
 }
 
+/* Anomalies Table */
+.results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.results-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #212529;
+  margin: 0;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+}
+
+.anomalies-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.anomalies-table thead {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.anomalies-table th {
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: #495057;
+  white-space: nowrap;
+  border-right: 1px solid #dee2e6;
+}
+
+.anomalies-table th:last-child {
+  border-right: none;
+}
+
+.anomalies-table tbody tr {
+  border-bottom: 1px solid #dee2e6;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.anomalies-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.anomalies-table td {
+  padding: 12px 16px;
+  border-right: 1px solid #dee2e6;
+}
+
+.anomalies-table td:last-child {
+  border-right: none;
+}
+
+/* Column widths */
+.col-severity {
+  width: 120px;
+}
+
+.col-type {
+  width: 140px;
+}
+
+.col-record {
+  width: 100px;
+}
+
+.col-column {
+  width: 120px;
+}
+
+.col-value {
+  width: 150px;
+}
+
+.col-confidence {
+  width: 110px;
+}
+
+.col-description {
+  width: 200px;
+}
+
+.col-actions {
+  width: 100px;
+  text-align: center;
+}
+
+/* Severity Badge */
+.severity-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 4px;
+  border-left: 3px solid;
+  font-weight: 600;
+  background-color: #f8f9fa;
+}
+
+.severity-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.severity-text {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.row-critical .severity-badge {
+  background-color: #fff5f5;
+}
+
+.row-major .severity-badge {
+  background-color: #fff9e6;
+}
+
+.row-minor .severity-badge {
+  background-color: #fffcf0;
+}
+
+/* Confidence Badge */
+.confidence-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: 4px;
+  background-color: #e7f3ff;
+  border: 1px solid #b8daff;
+}
+
+.confidence-value {
+  font-weight: 600;
+  color: #004085;
+  font-size: 12px;
+}
+
+/* Value and Description Text */
+.value-text,
+.description-text {
+  color: #495057;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 12px;
+}
+
+/* Expand Details Button */
+.btn-expand-details {
+  padding: 6px 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  white-space: nowrap;
+}
+
+.btn-expand-details:hover {
+  background-color: #0056b3;
+  box-shadow: 0 2px 4px rgba(0, 86, 179, 0.2);
+}
+
+.btn-expand-details:active {
+  transform: scale(0.98);
+}
+
+/* Table Row Details */
+.table-row-details {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+.details-content {
+  padding: 20px;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin-bottom: 16px;
+}
+
+.detail-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detail-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.detail-group label {
+  font-weight: 600;
+  color: #495057;
+  font-size: 13px;
+}
+
+.detail-group p {
+  color: #212529;
+  font-size: 13px;
+  margin: 0;
+  word-break: break-word;
+}
+
+.recommendation-box {
+  background-color: #fff3cd;
+  border-left: 3px solid #ffc107;
+  padding: 12px 16px;
+  border-radius: 4px;
+  color: #856404;
+}
+
+.recommendation-box p {
+  margin: 0;
+}
+
 /* Anomalies Actions */
 .anomalies-actions {
   display: flex;
