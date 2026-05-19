@@ -4,6 +4,7 @@ import Datasets from './pages/Datasets';
 import Validation from './pages/Validation';
 import Reconciliation from './pages/Reconciliation';
 import Anomalies from './pages/Anomalies';
+import Metrics from './pages/Metrics';
 
 export default function AppRoutes() {
   return (
@@ -13,6 +14,7 @@ export default function AppRoutes() {
       <Route path="/validation/:datasetId" element={<Validation />} />
       <Route path="/reconciliation/:datasetId" element={<Reconciliation />} />
       <Route path="/anomalies/:datasetId" element={<Anomalies />} />
+      <Route path="/metrics" element={<Metrics />} />
     </Routes>
   );
 }
